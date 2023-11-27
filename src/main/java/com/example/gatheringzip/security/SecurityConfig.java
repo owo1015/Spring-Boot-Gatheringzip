@@ -9,7 +9,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
-
+	
 	// 비밀번호 암호화 메소드
 	@Bean
 	BCryptPasswordEncoder encode() {
@@ -24,12 +24,18 @@ public class SecurityConfig {
 	    	.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
 	    			.requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
 	    			.requestMatchers(new AntPathRequestMatcher("/signup")).permitAll()
+	    			.requestMatchers(new AntPathRequestMatcher("/auth/**")).permitAll()
 	    			.requestMatchers(new AntPathRequestMatcher("/WEB-INF/**")).permitAll()
 	    			.anyRequest().authenticated())
-			.formLogin((formLogin)-> formLogin
+			.formLogin((formLogin) -> formLogin
 					.loginPage("/login")
-					.loginProcessingUrl("/loginProc")
-					.defaultSuccessUrl("/"));
+					.loginProcessingUrl("/auth/loginProc")
+					.usernameParameter("email")
+					.passwordParameter("password")
+					.defaultSuccessUrl("/login"))
+			.logout((logout) -> logout
+					.logoutUrl("/auth/logoutProc")
+					.logoutSuccessUrl("/login"));
 	  return http.build();
 	}
 }
